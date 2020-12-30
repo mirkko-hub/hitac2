@@ -14,7 +14,11 @@ knitr::opts_chunk$set(
 ```
 # hitac2
 
-__Warning: This package is still under development !__
+Warning: This package is still under development and lacks proper documentation / help / testing!
+
+__very, very BAAAAD!__
+
+For a first glimpse, check this out!
 
 ## Installation
 

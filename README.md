@@ -3,7 +3,12 @@
 
 # hitac2
 
-**Warning: This package is still under development \!**
+Warning: This package is still under development and lacks proper
+documentation / help / testing\!
+
+**very, very BAAAAD\!**
+
+For a first glimpse, check this out\!
 
 ## Installation
 
