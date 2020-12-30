@@ -1,0 +1,18 @@
+Group,Concentration_RuBP_mM,NaHCO3_uM,Concentration_KCl_mM,Concentration_CABP_uM,Tube,pH,Buffer,DTT_mM,Temperature_C,Rubisco,L1S1_uM,Rca,Rca6_uM,Additive,Additive_mM,Label
+A,0.4,30,50,0,Low-bind,8.4,50 mM MMT,0,25,NosRubisco,0.25,-,0,-,NA,ECM
+B,0.4,30,50,0.25,Low-bind,8.4,50 mM MMT,0,25,NosRubisco,0.25,-,0,-,NA,ECM.CABP
+C,0.4,30,50,0.25,Low-bind,8.4,50 mM MMT,0,25,NosRubisco,0.25,NosRca,0.5,-,NA,ECM.CABP + Rca
+D,0.4,30,50,0.25,Low-bind,8.4,50 mM MMT,0,25,NosRubisco,0.25,NosRcaΔC,0.5,-,NA,ECM.CABP + RcaΔC
+E,0.4,30,50,0.25,Low-bind,8.4,50 mM MMT,0,25,NosRubisco,0.25,NosRca,0.5,ATP,3,ECM.CABP + Rca + ATP
+F,0.4,30,50,0.25,Low-bind,8.4,50 mM MMT,0,25,NosRubisco,0.25,NosRcaΔC,0.5,ATP,3,ECM.CABP + RcaΔC + ATP
+G,0.4,30,50,0,Low-bind,8.4,50 mM MMT,0,25,NosRubisco,0.25,-,0,-,NA,ECM
+H,0.4,30,50,0.25,Low-bind,8.4,50 mM MMT,0,25,NosRubisco,0.25,-,0,-,NA,ECM.CABP
+I,0.4,30,50,0.25,Low-bind,8.4,50 mM MMT,0,25,NosRubisco,0.25,NosRcaΔC,1.25,ATP,3,ECM.CABP + 1.25 uM RcaΔC + ATP
+J,0.4,30,50,0.25,Low-bind,8.4,50 mM MMT,0,25,NosRubisco,0.25,NosRcaΔC,0.5,ATP,3,ECM.CABP + 0.5 uM RcaΔC + ATP
+K,0.4,30,50,0.25,Low-bind,8.4,50 mM MMT,0,25,NosRubisco,0.25,NosRcaΔC,0.25,ATP,3,ECM.CABP + 0.25 uM RcaΔC + ATP
+L,0.4,30,50,0.25,Low-bind,8.4,50 mM MMT,0,25,NosRubisco,0.25,NosRcaΔC,0.125,ATP,3,ECM.CABP + 0.125 uM RcaΔC + ATP
+M,0.4,30,50,0,Low-bind,8.4,50 mM MMT,0,25,NosRubisco,0.25,-,0,NA,NA,ECM
+N,0.4,30,50,0.25,Low-bind,8.4,50 mM MMT,0,25,NosRubisco,0.25,-,0,NA,NA,ECM.CABP
+O,0.4,30,50,0.25,Low-bind,8.4,50 mM MMT,0,25,NosRubisco,0.25,NosRca_red,0.5,ATP,3,ECM.CABP + 0.5 uM Rca_red + ATP
+P,0.4,30,50,0.25,Low-bind,8.4,50 mM MMT,0,25,NosRubisco,0.25,NosRca_ox,0.5,ATP,3,ECM.CABP + 0.5 uM Rca_ox + ATP
+Q,0.4,30,50,0.25,Low-bind,8.4,50 mM MMT,0,25,NosRubisco,0.25,NosRcaΔC,0.5,ATP,3,ECM.CABP + 0.5 uM RcaΔC + ATP

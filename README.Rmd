@@ -1,0 +1,153 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+# hitac2
+
+__Warning: This package is still under development !__
+
+## Installation
+
+You can install the released version of hitac2 from GitHub.
+
+```{r installation, eval = FALSE}
+# should not work, since the repo is private
+# devtools::install_github("mirkko-hub/hitac2")
+```
+
+```{r}
+library(tidyverse, warn.conflicts = FALSE)
+library(magrittr, warn.conflicts = FALSE)
+library(hitac2)
+library(minpack.lm)
+```
+
+### Example workflow
+
+* read data
+
+```{r read_data}
+ha_data <- hitachi_read(system.file("extdata", "D0X00000.001", package = "hitac2", mustWork = TRUE))
+design <- read_csv(system.file("extdata", "design.csv", package = "hitac2", mustWork = TRUE))
+treatment <- read_csv(system.file("extdata", "treatment.csv", package = "hitac2", mustWork = TRUE))
+
+ha_data <- left_join(ha_data, design, by = "Hitachi_ID")
+```
+
+* calculate specific activity (sa) and do background subtraction (bg)
+*  _how many CPM per given amount of NaHCO3?_
+
+```{r calculate_sa}
+table_activity <- hitachi_tibble(data = ha_data, treatment = treatment, V_RuBP = 4e-06, C_RuBP = 6e-04, convert = TRUE)
+```
+
+* quick check of control samples (sa and bg)
+
+```{r plot_control, echo=FALSE}
+# especially interesting for multiple replicates, here only one is shown
+ggplot(data = ha_data %>% filter(Group %in% c("sa", "bg")),
+                   mapping = aes(x = Set_ID, y = CPM)) +
+  geom_boxplot(aes(group = Set_ID)) +
+  geom_point(aes(group = Set_ID)) +
+  # facet_grid(Groups ~ .)
+  facet_wrap("Group", scales = "free")
+```
+* quick check of actual data
+
+```{r plot_data, echo=FALSE}
+data_dosedependence <- filter(table_activity, Group %in% LETTERS[7:12]) 
+data_dosedependence %>%
+  mutate(Time_min = Time_s / 60) %>%
+  ggplot(., mapping = aes(x = Time_min, y = Activity_nmol, colour = Label)) +
+  geom_smooth(mapping = aes(colour = Label), linetype = 3, size = 0.6, se = F) +
+  # geom_point(mapping = aes(colour = Label)) +
+  geom_pointrange(data = data_dosedependence %>%
+                    mutate(Time_min = Time_s / 60) %>% 
+                    group_by(Label, Time_min) %>%
+                    summarise(Activity_avg = mean(Activity_nmol), Activity_sd = sd(Activity_nmol)) %>%
+                    mutate(Activity_nmol = Activity_avg),
+                  mapping = aes(x = Time_min, ymin = Activity_avg - Activity_sd, ymax = Activity_avg + Activity_sd, colour = Label),
+                  fatten = 0.2) +
+   labs(x = expression(paste("Time (min)")), y = expression(paste("fixed carbon (" ,nmol, ")")))
+
+```
+
+### Add some models
+
+* fit an inappropriate model and plot for visualization
+
+```{r model}
+# model
+sigmoidal_nls_4p <- function(df){
+  `minpack.lm`::nlsLM(Activity_nmol ~ asym_high + ((asym_low - asym_high) / (1+exp(slope * (Time_min - Time_inflect)))),
+      data = df,
+      start = list(asym_low = min(df$Activity_nmol),
+                   asym_high = max(df$Activity_nmol),
+                   slope = 1,
+                   Time_inflect = max(df$Time_min) / 2))
+}
+
+# fit
+data_dosedependence %>%
+  mutate(Time_min = Time_s / 60) %>%
+  select(Label, Time_min, Activity_nmol) %>%
+  nest(data = c(Time_min, Activity_nmol)) %>%
+  mutate(model = map(data, sigmoidal_nls_4p)) %>% select(Label, model) %>%
+  right_join(tibble(
+    Label = rep(.$Label %>% unique, each = 49),
+    Time_min = rep(seq(2, 26, by = 0.5), 6)),
+    by = "Label") %>%
+  nest(data = c(Time_min)) %>%
+  mutate(`Activity fitted` = map2(data, model, modelr::add_predictions, var = "Activity fitted")) %>%
+  unnest(`Activity fitted`) %>%
+  ggplot(.) +
+  geom_line(aes(x = Time_min, y = `Activity fitted`, colour = Label)) +
+  # for multiple replicates
+  geom_pointrange(data = data_dosedependence %>%
+                    mutate(Time_min = Time_s / 60) %>%
+                    group_by(Label, Time_min) %>%
+                    summarise(Activity_avg = mean(Activity_nmol), Activity_sd = sd(Activity_nmol)),
+                  mapping = aes(x = Time_min, y = Activity_avg,
+                                ymin = Activity_avg - Activity_sd,
+                                ymax = Activity_avg + Activity_sd, colour = Label),
+                  fatten = 0.2) +
+  labs(x = expression(paste("Time (min)")), y = expression(CO[2] ~ (nmol)))
+
+```
+
+* how about a michaelis-menten plot?
+
+```{r michaelis_menten}
+# some more data
+michaelis_menten
+
+# fit groupwise (1 per Concentration), linear models
+ha_extract_lm <- hitachi_extract_lm(data = michaelis_menten) # raw-data for plotting linear models
+
+# extract estimates of linear model
+ha_extract_rate <- hitachi_extract_rate(ha_extract_lm)
+
+# build model matrix
+ha_modelmatrix <- hitachi_model(ha_extract_rate)
+
+# plot
+ggplot(ha_extract_rate, aes(x = S, y = v)) +
+  theme_bw() +
+  labs(y = expression(paste("initial velocity ( ", nmol / sec, " )")), x = expression(paste("[RuBP] ( ", mM, " )"))) +
+  geom_point(size = 0.5) +
+  geom_errorbar(data = ha_extract_rate, aes(x = S, ymin = v - std.error, ymax = v + std.error)) +
+  geom_line(data = ha_modelmatrix, aes(x = S, y = Velocity_mod, colour = model))
+
+```
+
+
