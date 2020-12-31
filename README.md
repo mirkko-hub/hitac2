@@ -15,8 +15,7 @@ For a first glimpse, check this out\!
 You can install the released version of hitac2 from GitHub.
 
 ``` r
-# should not work, since the repo is private
-# devtools::install_github("mirkko-hub/hitac2")
+devtools::install_github("mirkko-hub/hitac2")
 ```
 
 ``` r
